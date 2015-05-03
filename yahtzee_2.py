@@ -9,13 +9,20 @@ from collections import Counter, namedtuple
 
 # In[ ]:
 
-dices = [i for i in range(1, 7)]
-throws = {}
-# the code below is overkill in that it generates all 46656 combinations of 6 dice throws
-# but the resulting unique set is 462 combination, which seems to be correct
-for i in itertools.product(dices, dices, dices, dices, dices, dices):
-    throw = ''.join([str(j) for j in sorted(i)])
-    throws[throw] = ''
+def get_dice_frequencies(throw):
+    """
+    Returns the counts of unique dice, pairs, three of a kind etc
+    """
+    c = Counter(throw)
+    frequencies = {}
+    for i in [str(j) for j in range(1, 7)]:
+        if i in c:
+            result_type = types[c[i]]
+            if result_type in frequencies:
+                frequencies[result_type].append(i)
+            else:
+                frequencies[result_type] = [i]
+    return frequencies
 
 
 # In[ ]:
@@ -46,13 +53,12 @@ def dicesum(throw):
 def get_throw_result(throw):
     """
     Determines the type of throw:
-    Full/Big/Smal straight
+    Full/Big/Small straight
     Maxi Yahtzee, 5/4/3 equal
     3/2/1 pair
     Tower and Castle
     To Do: number of 1's, 2's, 3's, ... for the top part of the scoring table
     """
-    # note that the order of the checks is important!
     
     # check input
     assert type(throw) is str, 'String expected, but "%r" is %r' % (throw, type(throw))
@@ -60,48 +66,59 @@ def get_throw_result(throw):
 
     # process
     throw_type = ''
-    result = namedtuple('result', ['type', 'score'])
-    dice_counts = Counter(throw).values()
+    throw_results = []
+#    dice_counts = Counter(throw).values()
     if throw == '123456':
-        return result('Full straight', 21)
-    elif ''.join(sorted(set(throw))) == '12345':
-        return result('Small straight', 15)
-    elif ''.join(sorted(set(throw))) == '23456':
-        return result('Big straight', 20)
-    elif 6 in dice_counts:
-        return result('Maxi Yahtzee', 100)
-    elif 5 in dice_counts:
-        five = dice_at_frequency(throw, 5)[0]
-        return result('Five equal', 5 * five)
-    elif 4 in dice_counts and 2 in dice_counts:
-        return result('Tower (4 + 2)', dicesum(throw))
-    elif 4 in dice_counts:
-        four = dice_at_frequency(throw, 4)[0]
-        return result('Four equal', 4 * four)
-    elif dice_counts == [3, 3]:
-        return result('Castle (3 + 3)', dicesum(throw))
-    elif 3 in dice_counts:
-        three = dice_at_frequency(throw, 3)
-        return result('Three equal', [3 * i for i in three])
-    elif dice_counts == [2, 2, 2]:
-        return result('Three pairs', dicesum(throw))
-    elif sorted(dice_counts)[-2:] == [2, 2]:
-        two = dice_at_frequency(throw, 2)
-        return result('Two pairs', sum([2 * i for i in two]))
-    elif sorted(dice_counts)[-1:] == [2]:
-        two = dice_at_frequency(throw, 2)
-        return result('One pair', [2 * i for i in two])
-    else:
+        throw_results.append(result('Full straight', '123456', 21))
+    if ''.join(sorted(set(throw)))[0:5] == '12345':
+        throw_results.append(result('Small straight', '12345', 15))
+    if ''.join(sorted(set(throw)))[-5:] == '23456':
+        throw_results.append(result('Big straight', '23456', 20))
+
+    # Collect dice frequencies
+    dice_frequencies = get_dice_frequencies(throw)
+    # test for pairs, three of a kind, ..., Maxi Yahtzee
+    for f in range(2,7):
+        result_type = types[f]
+        if result_type in dice_frequencies:
+            for dice in dice_frequencies[result_type]:
+                throw_results.append(result(result_type, dice, f * int(dice)))
+    # test for Tower, Castle, Two pair, Three pair
+    if 'Pair' in dice_frequencies and len(dice_frequencies['Pair']) == 3:
+        throw_results.append(result('Three pair', throw, dicesum(throw)))
+    if 'Three of a kind' in dice_frequencies and len(dice_frequencies['Three of a kind']) == 2:
+        throw_results.append(result('Castle (3 + 3)', throw, dicesum(throw)))
+    if 'Four of a kind' in dice_frequencies and 'Pair' in dice_frequencies:
+        throw_results.append(result('Tower (4 + 2)', throw, dicesum(throw)))
+    if len(throw_results) < 1 :
         raise Exception("Unknown combination of dice: " , throw)
-    return throw_type
+    return throw_results
+
+
+# In[ ]:
+
+types = ',Single,Pair,Three of a kind,Four of a kind,Five of a kind,Maxi Yahtzee'.split(',')
+dices = [i for i in range(1, 7)]
+throws = {}
+result = namedtuple('result', ['type', 'dice', 'score'])
+# the code below is overkill in that it generates all 46656 combinations of 6 dice throws
+# but the resulting unique set is 462 combination, which seems to be correct
+for i in itertools.product(dices, dices, dices, dices, dices, dices):
+    throw = ''.join([str(j) for j in sorted(i)])
+    throws[throw] = ''
 
 
 # In[ ]:
 
 for throw in sorted(throws):
-    throw_result = get_throw_result(throw)
-    print throw, throw_result.type, throw_result.score
-    #if throw_type: print throw, throw_type
+    throw_results = get_throw_result(throw)
+    print throw, [(t.type, t.dice, t.score) for t in throw_results]
+
+
+# In[ ]:
+
+#get_throw_result('556677')
+#Counter('556677')
 
 
 # In[ ]:
@@ -116,25 +133,25 @@ for throw in sorted(throws):
 
 # In[ ]:
 
+def test_dice_frequencies_singles():
+    assert get_dice_frequencies('123456') == {'Single': ['1', '2', '3', '4', '5', '6']}
+def test_dice_frequencies_3():
+    assert get_dice_frequencies('222333') == {'Three of a kind': ['2', '3']}
+def test_dice_frequencies_4():
+    assert get_dice_frequencies('111122') == {'Four of a kind': ['1'], 'Pair': ['2']}
+def test_dice_frequencies_6():
+    assert get_dice_frequencies('111111') == {'Maxi Yahtzee': ['1']}
+
+
+# In[ ]:
+
 def test_Tower():
-    result = get_throw_result('222233')
-    assert result.type  == 'Tower (4 + 2)', result.type
-    assert result.score == 14, result.score
-
+    assert get_throw_result('111122') == [result(type='Pair', dice='2', score=4),
+                                          result(type='Four of a kind', dice='1', score=4),
+                                          result(type='Tower (4 + 2)', dice='111122', score=8)]
 def test_Three_pairs():
-    result = get_throw_result('112244')
-    assert result.type  == 'Three pairs', result.type
-    assert result.score == 14, result.score
-
-
-# In[ ]:
-
-two = dice_at_frequency('112234',2)
-print two
-#[3 * i for i in three]
-
-
-# In[ ]:
-
-
+    assert get_throw_result('112244') == [result(type='Pair', dice='1', score=2),
+                                          result(type='Pair', dice='2', score=4),
+                                          result(type='Pair', dice='4', score=8),
+                                          result(type='Three pair', dice='112244', score=14)]
 
