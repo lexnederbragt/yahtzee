@@ -1,19 +1,19 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 import itertools
 from collections import Counter, namedtuple
 
 
-# In[2]:
+# In[ ]:
 
 def get_types():
     return ',Single,Pair,Three of a kind,Four of a kind,Five of a kind,Maxi Yahtzee'.split(',')
 
 
-# In[3]:
+# In[ ]:
 
 def get_dice_frequencies(throw, types):
     """
@@ -31,7 +31,7 @@ def get_dice_frequencies(throw, types):
     return frequencies
 
 
-# In[4]:
+# In[ ]:
 
 def dicesum(throw):
     """
@@ -40,7 +40,7 @@ def dicesum(throw):
     return sum([int(i) for i in throw])
 
 
-# In[5]:
+# In[ ]:
 
 def get_throw_result(throw, types):
     """
@@ -87,7 +87,7 @@ def get_throw_result(throw, types):
     return throw_results
 
 
-# In[6]:
+# In[ ]:
 
 def test_dice_frequencies_singles():
     assert get_dice_frequencies('123456', types = get_types()) == {'Single': ['1', '2', '3', '4', '5', '6']}
@@ -99,7 +99,7 @@ def test_dice_frequencies_6():
     assert get_dice_frequencies('111111', types = get_types()) == {'Maxi Yahtzee': ['1']}
 
 
-# In[7]:
+# In[ ]:
 
 def test_Tower():
     assert get_throw_result('111122', types = get_types()) == [result(type='Pair', dice='2', score=4),
@@ -116,7 +116,15 @@ def test_Maxi_yahtzee():
     assert get_throw_result('222222', types = get_types()) == [result(type='Maxi Yahtzee', dice='2', score=12)]
 
 
-# In[8]:
+# In[ ]:
+
+def test_dicesum_123456():
+    assert dicesum('123456') == 21, dicesum('123456')
+def test_dicesum_222222():
+    assert dicesum('222222') == 12, dicesum('222222')
+
+
+# In[ ]:
 
 def test_dice_too_low_high_fail():
     try:
@@ -135,7 +143,7 @@ def test_dice_too_short_fail():
         assert e.message == 'Throw expected to be 6 characters, not 5', e.message
 
 
-# In[10]:
+# In[ ]:
 
 result = namedtuple('result', ['type', 'dice', 'score'])
 if __name__ == '__main__':
