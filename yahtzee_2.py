@@ -1,13 +1,13 @@
 
 # coding: utf-8
 
-# In[13]:
+# In[ ]:
 
 import itertools
 from collections import Counter, namedtuple
 
 
-# In[14]:
+# In[ ]:
 
 def get_dice_frequencies(throw):
     """
@@ -28,7 +28,7 @@ def get_dice_frequencies(throw):
     return frequencies
 
 
-# In[15]:
+# In[ ]:
 
 def dicesum(throw):
     """
@@ -37,9 +37,9 @@ def dicesum(throw):
     return sum([int(i) for i in throw])
 
 
-# In[16]:
+# In[ ]:
 
-def get_throw_result(throw):
+def get_throw_result(throw, dice_frequencies):
     """
     Determines the type of throw:
     Full/Big/Small straight
@@ -65,7 +65,6 @@ def get_throw_result(throw):
         throw_results.append(result('Big straight', '23456', 20))
 
     # Collect dice frequencies
-    dice_frequencies = get_dice_frequencies(throw)
     # test for pairs, three of a kind, ..., Maxi Yahtzee
     for f in range(2,7):
         result_type = types[f]
@@ -84,7 +83,7 @@ def get_throw_result(throw):
     return throw_results
 
 
-# In[17]:
+# In[ ]:
 
 def test_dice_frequencies_singles():
     assert get_dice_frequencies('123456') == {'Single': ['1', '2', '3', '4', '5', '6']}
@@ -96,24 +95,24 @@ def test_dice_frequencies_6():
     assert get_dice_frequencies('111111') == {'Maxi Yahtzee': ['1']}
 
 
-# In[18]:
+# In[ ]:
 
 def test_Tower():
-    assert get_throw_result('111122') == [result(type='Pair', dice='2', score=4),
-                                          result(type='Four of a kind', dice='1', score=4),
-                                          result(type='Tower (4 + 2)', dice='111122', score=8)]
+    assert get_throw_result('111122', get_dice_frequencies('111122')) ==     [result(type='Pair', dice='2', score=4),
+     result(type='Four of a kind', dice='1', score=4),
+     result(type='Tower (4 + 2)', dice='111122', score=8)]
 def test_Three_pairs():
-    assert get_throw_result('112244') == [result(type='Pair', dice='1', score=2),
-                                          result(type='Pair', dice='2', score=4),
-                                          result(type='Pair', dice='4', score=8),
-                                          result(type='Three pair', dice='112244', score=14)]
+    assert get_throw_result('112244', get_dice_frequencies('112244')) ==     [result(type='Pair', dice='1', score=2),
+     result(type='Pair', dice='2', score=4),
+     result(type='Pair', dice='4', score=8),
+     result(type='Three pair', dice='112244', score=14)]
 def test_Five_of_a_kind():
-    assert get_throw_result('444441') == [result(type='Five of a kind', dice='4', score=20)]
+    assert get_throw_result('444441', get_dice_frequencies('444441')) ==     [result(type='Five of a kind', dice='4', score=20)]
 def test_Maxi_yahtzee():
-    assert get_throw_result('222222') == [result(type='Maxi Yahtzee', dice='2', score=12)]
+    assert get_throw_result('222222', get_dice_frequencies('222222')) ==     [result(type='Maxi Yahtzee', dice='2', score=12)]
 
 
-# In[19]:
+# In[ ]:
 
 def test_dicesum_123456():
     assert dicesum('123456') == 21, dicesum('123456')
@@ -121,26 +120,26 @@ def test_dicesum_222222():
     assert dicesum('222222') == 12, dicesum('222222')
 
 
-# In[20]:
+# In[ ]:
 
 def test_dice_too_low_high_fail():
     try:
-        t = get_throw_result('012345')
+        t = get_throw_result('012345', get_dice_frequencies('012345'))
     except AssertionError, e:
         assert e.message == 'Only dices between 1 and 6 allowed, found "012345"', e.message
 def test_dice_as_int_not_string_fail():
     try:
-        t = get_throw_result(123456)
+        t = get_throw_result(123456, get_dice_frequencies('123456'))
     except AssertionError, e:
         assert e.message == 'String expected, but "123456" is <type \'int\'>', e.message
 def test_dice_too_short_fail():
     try:
-        t = get_throw_result('12345')
+        t = get_throw_result('12345', get_dice_frequencies('12345'))
     except AssertionError, e:
         assert e.message == 'Throw expected to be 6 characters, not 5', e.message
 
 
-# In[21]:
+# In[ ]:
 
 result = namedtuple('result', ['type', 'dice', 'score'])
 types = ',Single,Pair,Three of a kind,Four of a kind,Five of a kind,Maxi Yahtzee'.split(',')
@@ -154,6 +153,7 @@ if __name__ == '__main__':
         throws[throw] = ''
     # assing score to each throw
     for throw in sorted(throws):
-        throw_results = get_throw_result(throw)
+        dice_frequencies = get_dice_frequencies(throw)
+        throw_results = get_throw_result(throw, dice_frequencies)
         print throw, [(t.type, t.dice, t.score) for t in throw_results]
 
