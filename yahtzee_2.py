@@ -9,6 +9,18 @@ from collections import Counter, namedtuple
 
 # In[ ]:
 
+class score:
+    """
+    Holds dice frequencies and score results for a throw
+    """
+    def __init__(self, throw):
+        self.throw = throw
+        self.frequencies = get_dice_frequencies(throw)
+        self.results = get_throw_result(throw, self.frequencies)
+
+
+# In[ ]:
+
 def get_dice_frequencies(throw):
     """
     Returns a dictionary with the counts of unique dice, pairs, three of a kind etc
@@ -143,17 +155,21 @@ def test_dice_too_short_fail():
 
 result = namedtuple('result', ['type', 'dice', 'score'])
 types = ',Single,Pair,Three of a kind,Four of a kind,Five of a kind,Maxi Yahtzee'.split(',')
+
+
+# In[ ]:
+
 if __name__ == '__main__':
     dices = [i for i in range(1, 7)]
     throws = {}
+    all_scores = {}
     # the code below is overkill in that it generates all 46656 combinations of 6 dice throws
     # but the resulting unique set is 462 combination, which seems to be correct
     for i in itertools.product(dices, dices, dices, dices, dices, dices):
         throw = ''.join([str(j) for j in sorted(i)])
         throws[throw] = ''
-    # assing score to each throw
+    # adding score to each throw
     for throw in sorted(throws):
-        dice_frequencies = get_dice_frequencies(throw)
-        throw_results = get_throw_result(throw, dice_frequencies)
-        print throw, [(t.type, t.dice, t.score) for t in throw_results]
+        all_scores[throw] = score(throw)
+        print throw, [(t.type, t.dice, t.score) for t in all_scores[throw].results]
 
