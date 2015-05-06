@@ -1,12 +1,12 @@
 
 # coding: utf-8
 
-# In[74]:
+# In[ ]:
 
-from yahtzee_2 import *
+from yahtzee_2 import get_all_scores, types
 
 
-# In[21]:
+# In[ ]:
 
 type_descriptions = {'Tower (4 + 2)' : ['Pair', 'Four of a kind']}
 description_counts = {}
@@ -14,7 +14,7 @@ for i,j in enumerate(types):
     description_counts[j] = i
 
 
-# In[107]:
+# In[ ]:
 
 def get_diff(throw_in, target):
     diff = 0
@@ -29,24 +29,18 @@ def get_diff(throw_in, target):
     return diff, ''.join(keep), ''.join(remove)
 
 
-# In[108]:
+# In[ ]:
 
-dices = [i for i in range(1, 7)]
-throws = {}
-# the code below is overkill in that it generates all 46656 combinations of 6 dice throws
-# but the resulting unique set is 462 combination, which seems to be correct
-for i in itertools.product(dices, dices, dices, dices, dices, dices):
-    throw = ''.join([str(j) for j in sorted(i)])
-    throws[throw] = ''
+all_scores = get_all_scores()
 
 
-# In[112]:
+# In[ ]:
 
 throw_in = '111344'
 desired_type = 'Castle (3 + 3)' #'Maxi Yahtzee' # 'Tower (4 + 2)':
 shortest_dist = {6: None}
-for throw in sorted(throws):
-    for result in score(throw).results:
+for throw in all_scores:
+    for result in all_scores[throw].results:
         if result.type == desired_type:
             (dist, keep, remove) = get_diff(throw_in, throw)
             print throw, "distance %r, keep %r, remove %r" % (dist, keep, remove)
@@ -55,7 +49,7 @@ for throw in sorted(throws):
 print shortest_dist
 
 
-# In[5]:
+# In[ ]:
 
 # from http://stackoverflow.com/questions/2460177/edit-distance-in-python
 #this calculates edit distance not levenstein edit distance
@@ -78,7 +72,7 @@ def distance(word1, word2):
     return x[i][j]
 
 
-# In[9]:
+# In[ ]:
 
 word1="rosettacode"
 word2="raisethysword"
