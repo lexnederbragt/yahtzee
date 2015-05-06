@@ -164,7 +164,7 @@ types = ',Single,Pair,Three of a kind,Four of a kind,Five of a kind,Maxi Yahtzee
 
 # In[ ]:
 
-if __name__ == '__main__':
+def get_all_scores():
     dices = [i for i in range(1, 7)]
     throws = {}
     all_scores = {}
@@ -174,7 +174,20 @@ if __name__ == '__main__':
         throw = ''.join([str(j) for j in sorted(i)])
         throws[throw] = ''
     # adding score to each throw
-    for throw in sorted(throws):
+    for throw in throws:
         all_scores[throw] = score(throw)
+    return all_scores
+
+
+# In[ ]:
+
+if __name__ == '__main__':
+    all_scores = get_all_scores()
+
+
+# In[ ]:
+
+if __name__ == '__main__':
+    for throw in sorted(all_scores):
         print throw, [(t.type, t.dice, t.score) for t in all_scores[throw].results]
 
