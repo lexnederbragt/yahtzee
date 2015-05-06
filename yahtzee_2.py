@@ -1,6 +1,11 @@
 
 # coding: utf-8
 
+# **Issues**  
+# 
+# * 'Two pairs' missing as result
+# * 'Full house (2 + 3)' missing as result
+
 # In[ ]:
 
 import itertools
@@ -56,7 +61,7 @@ def get_throw_result(throw, dice_frequencies):
     Determines the type of throw:
     Full/Big/Small straight
     Maxi Yahtzee, 5/4/3 equal
-    3/2/1 pair
+    3/2/1 pair(s)
     Tower and Castle
     To Do: number of 1's, 2's, 3's, ... for the top part of the scoring table
     """
@@ -83,9 +88,9 @@ def get_throw_result(throw, dice_frequencies):
         if result_type in dice_frequencies:
             for dice in dice_frequencies[result_type]:
                 throw_results.append(result(result_type, dice, f * int(dice)))
-    # test for Tower, Castle, Two pair, Three pair
+    # test for Tower, Castle, Two pairs, Three pairs
     if 'Pair' in dice_frequencies and len(dice_frequencies['Pair']) == 3:
-        throw_results.append(result('Three pair', throw, dicesum(throw)))
+        throw_results.append(result('Three pairs', throw, dicesum(throw)))
     if 'Three of a kind' in dice_frequencies and len(dice_frequencies['Three of a kind']) == 2:
         throw_results.append(result('Castle (3 + 3)', throw, dicesum(throw)))
     if 'Four of a kind' in dice_frequencies and 'Pair' in dice_frequencies:
@@ -117,7 +122,7 @@ def test_Three_pairs():
     assert get_throw_result('112244', get_dice_frequencies('112244')) ==     [result(type='Pair', dice='1', score=2),
      result(type='Pair', dice='2', score=4),
      result(type='Pair', dice='4', score=8),
-     result(type='Three pair', dice='112244', score=14)]
+     result(type='Three pairs', dice='112244', score=14)]
 def test_Five_of_a_kind():
     assert get_throw_result('444441', get_dice_frequencies('444441')) ==     [result(type='Five of a kind', dice='4', score=20)]
 def test_Maxi_yahtzee():
