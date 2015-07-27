@@ -3,7 +3,6 @@
 
 # **Issues**  
 # 
-# * 'Two pairs' missing as result
 # * 'Full house (2 + 3)' missing as result
 
 # In[ ]:
@@ -97,6 +96,8 @@ def get_throw_result(throw, dice_frequencies):
     # test for Tower, Castle, Two pairs, Three pairs
     if 'Pair' in dice_frequencies and len(dice_frequencies['Pair']) == 3:
         throw_results.append(result('Three pairs', throw, dicesum(throw)))
+    if 'Pair' in dice_frequencies and len(dice_frequencies['Pair']) == 2:
+        throw_results.append(result('Two pairs', throw, dicesum(throw)))
     if 'Three of a kind' in dice_frequencies and len(dice_frequencies['Three of a kind']) == 2:
         throw_results.append(result('Castle (3 + 3)', throw, dicesum(throw)))
     if 'Four of a kind' in dice_frequencies and 'Pair' in dice_frequencies:
@@ -129,6 +130,10 @@ def test_Three_pairs():
      result(type='Pair', dice='2', score=4),
      result(type='Pair', dice='4', score=8),
      result(type='Three pairs', dice='112244', score=14)]
+def test_Two_pairs():
+    assert get_throw_result('112245', get_dice_frequencies('112245')) ==     [result(type='Pair', dice='1', score=2),
+     result(type='Pair', dice='2', score=4),
+     result(type='Two pairs', dice='112245', score=15)]
 def test_Five_of_a_kind():
     assert get_throw_result('444441', get_dice_frequencies('444441')) ==     [result(type='Five of a kind', dice='4', score=20)]
 def test_Maxi_yahtzee():
