@@ -33,11 +33,16 @@ def get_dice_frequencies(throw):
     '222333' returns {'Three of a kind': ['2', '3']}
     '123344' returns {'Pair': ['3', '4'], 'Single': ['1', '2']}
     """
+    # use the Counter function to get frequencies as dictionary
+    # keys are the dice, value is the count (frequency)
+    # example: '123344' --> Counter({'3': 2, '4': 2, '1': 1, '2': 1})
+
     c = Counter(throw)
     frequencies = {}
+    # loop through the possible frequencies, 1 --> single, 2 --> Pair etc
     for i in [str(j) for j in range(1, 7)]:
         if i in c:
-            result_type = types[c[i]]
+            result_type = singleDiceTypes[c[i]]
             if result_type in frequencies:
                 frequencies[result_type].append(i)
             else:
@@ -74,6 +79,7 @@ def get_throw_result(throw, dice_frequencies):
     # process
     throw_type = ''
     throw_results = []
+    # check for straight cases first
     if throw == '123456':
         throw_results.append(result('Full straight', '123456', 21))
     if ''.join(sorted(set(throw)))[0:5] == '12345':
@@ -81,10 +87,10 @@ def get_throw_result(throw, dice_frequencies):
     if ''.join(sorted(set(throw)))[-5:] == '23456':
         throw_results.append(result('Big straight', '23456', 20))
 
-    # Collect dice frequencies
+    # collect dice frequencies
     # test for pairs, three of a kind, ..., Maxi Yahtzee
     for f in range(2,7):
-        result_type = types[f]
+        result_type = singleDiceTypes[f]
         if result_type in dice_frequencies:
             for dice in dice_frequencies[result_type]:
                 throw_results.append(result(result_type, dice, f * int(dice)))
@@ -159,7 +165,7 @@ def test_dice_too_short_fail():
 # In[ ]:
 
 result = namedtuple('result', ['type', 'dice', 'score'])
-types = ',Single,Pair,Three of a kind,Four of a kind,Five of a kind,Maxi Yahtzee'.split(',')
+singleDiceTypes = ',Single,Pair,Three of a kind,Four of a kind,Five of a kind,Maxi Yahtzee'.split(',')
 
 
 # In[ ]:
