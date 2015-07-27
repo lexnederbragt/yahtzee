@@ -3,15 +3,14 @@
 
 # **Issues**  
 # 
-# * 'Full house (2 + 3)' missing as result
 
-# In[1]:
+# In[37]:
 
 import itertools
 from collections import Counter, namedtuple
 
 
-# In[2]:
+# In[38]:
 
 class score:
     """
@@ -23,7 +22,7 @@ class score:
         self.results = get_throw_result(throw, self.frequencies)
 
 
-# In[3]:
+# In[39]:
 
 def get_dice_frequencies(throw):
     """
@@ -49,7 +48,7 @@ def get_dice_frequencies(throw):
     return frequencies
 
 
-# In[4]:
+# In[40]:
 
 def dicesum(throw):
     """
@@ -58,7 +57,7 @@ def dicesum(throw):
     return sum([int(i) for i in throw])
 
 
-# In[5]:
+# In[41]:
 
 def get_throw_result(throw, dice_frequencies):
     """
@@ -109,7 +108,7 @@ def get_throw_result(throw, dice_frequencies):
     return throw_results
 
 
-# In[6]:
+# In[42]:
 
 def test_dice_frequencies_singles():
     assert get_dice_frequencies('123456') == {'Single': ['1', '2', '3', '4', '5', '6']}
@@ -121,7 +120,7 @@ def test_dice_frequencies_6():
     assert get_dice_frequencies('111111') == {'Maxi Yahtzee': ['1']}
 
 
-# In[7]:
+# In[43]:
 
 def test_Tower():
     assert get_throw_result('111122', get_dice_frequencies('111122')) ==     [result(type='Pair', dice='2', score=4),
@@ -146,7 +145,7 @@ def test_Maxi_yahtzee():
     assert get_throw_result('222222', get_dice_frequencies('222222')) ==     [result(type='Maxi Yahtzee', dice='2', score=12)]
 
 
-# In[8]:
+# In[44]:
 
 def test_dicesum_123456():
     assert dicesum('123456') == 21, dicesum('123456')
@@ -154,7 +153,7 @@ def test_dicesum_222222():
     assert dicesum('222222') == 12, dicesum('222222')
 
 
-# In[9]:
+# In[45]:
 
 def test_dice_too_low_high_fail():
     try:
@@ -173,13 +172,13 @@ def test_dice_too_short_fail():
         assert e.message == 'Throw expected to be 6 characters, not 5', e.message
 
 
-# In[10]:
+# In[46]:
 
 result = namedtuple('result', ['type', 'dice', 'score'])
 singleDiceTypes = ',Single,Pair,Three of a kind,Four of a kind,Five of a kind,Maxi Yahtzee'.split(',')
 
 
-# In[11]:
+# In[47]:
 
 def get_all_scores():
     dices = [i for i in range(1, 7)]
@@ -196,15 +195,36 @@ def get_all_scores():
     return all_scores
 
 
-# In[12]:
+# In[48]:
 
 if __name__ == '__main__':
     all_scores = get_all_scores()
 
 
-# In[13]:
+# In[49]:
+
+#if __name__ == '__main__':
+#    for throw in sorted(all_scores):
+#        print throw, [(t.type, t.dice, t.score) for t in all_scores[throw].results]
+
+
+# In[50]:
 
 if __name__ == '__main__':
     for throw in sorted(all_scores):
-        print throw, [(t.type, t.dice, t.score) for t in all_scores[throw].results]
+        print sorted(Counter(throw).values()),[(t.type) for t in all_scores[throw].results]
 
+ python yahtzee_2.py | sort | uniq -c
+   1 [1, 1, 1, 1, 1, 1] ['Full straight', 'Small straight', 'Big straight']
+   5 [1, 1, 1, 1, 2] ['Big straight', 'Pair']
+  20 [1, 1, 1, 1, 2] ['Pair']
+   5 [1, 1, 1, 1, 2] ['Small straight', 'Pair']
+  60 [1, 1, 1, 3] ['Three of a kind']
+  90 [1, 1, 2, 2] ['Pair', 'Pair', 'Two pairs']
+  60 [1, 1, 4] ['Four of a kind']
+ 120 [1, 2, 3] ['Pair', 'Three of a kind', 'Full house (2 + 3)']
+  30 [1, 5] ['Five of a kind']
+  20 [2, 2, 2] ['Pair', 'Pair', 'Pair', 'Three pairs']
+  30 [2, 4] ['Pair', 'Four of a kind', 'Tower (4 + 2)']
+  15 [3, 3] ['Three of a kind', 'Three of a kind', 'Castle (3 + 3)']
+   6 [6] ['Maxi Yahtzee']
